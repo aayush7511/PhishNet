@@ -1,0 +1,69 @@
+/* ================================================================
+   Design tokens
+   ================================================================ */
+:root {
+  --bg-base:        #0f1521;
+  --bg-card:        #151e2d;
+  --bg-row:         #1a2438;
+  --bg-input:       #111827;
+  --border:         #2a3a4a;
+  --text-primary:   #ffffff;
+  --text-muted:     #6b7a8d;
+  --text-secondary: #94a3b8;
+  --green:          #4ade80;
+  --green-bg:       #14532d;
+  --green-icon:     #22c55e;
+  --amber:          #f59e0b;
+  --amber-bg:       #451a03;
+  --red:            #f87171;
+  --red-bg:         #450a0a;
+  --blue:           #3b82f6;
+  --blue-dark:      #1d4ed8;
+}
+
+/* ================================================================
+   Reset
+   ================================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+textarea {
+  font-family: inherit;
+}
+
+input {
+  font-family: inherit;
+}
