@@ -24,11 +24,16 @@ EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 def get_current_user():
     """
-    Decode the JWT cookie and return the matching User, or None.
+    Decode the JWT and return the matching User, or None.
 
+    Checks Authorization: Bearer header first, falls back to cookie.
     Never raises — returns None on any auth failure.
     """
-    token = request.cookies.get(TOKEN_COOKIE_NAME)
+    auth_header = request.headers.get('Authorization', '')
+    if auth_header.startswith('Bearer '):
+        token = auth_header[7:]
+    else:
+        token = request.cookies.get(TOKEN_COOKIE_NAME)
     if not token:
         return None
     try:
@@ -153,7 +158,7 @@ def login():
                         "message": "Invalid email or password"}), 401
 
     token = _make_token(user.id)
-    response = make_response(jsonify({"user": user.to_dict()}), 200)
+    response = make_response(jsonify({"user": user.to_dict(), "token": token}), 200)
     _set_token_cookie(response, token)
     return response
 

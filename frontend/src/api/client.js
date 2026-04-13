@@ -1,28 +1,44 @@
 /**
  * API client — single source of truth for all HTTP calls to the backend.
  * All functions normalize errors to { code, message } objects.
+ *
+ * Auth uses Authorization: Bearer <token> headers so the JWT works
+ * cross-origin (Vercel → Render) without SameSite cookie restrictions.
+ * The token is persisted in localStorage so it survives page reloads.
  */
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5000';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5001';
 
-/**
- * Shared fetch wrapper with consistent error normalization.
- * @param {string} path
- * @param {RequestInit} options
- * @returns {Promise<any>} parsed JSON body
- */
+// ---------------------------------------------------------------------------
+// Token store
+// ---------------------------------------------------------------------------
+
+let _authToken = localStorage.getItem('phishnet_auth_token') || null;
+
+export function setAuthToken(token) {
+  _authToken = token;
+  if (token) localStorage.setItem('phishnet_auth_token', token);
+  else        localStorage.removeItem('phishnet_auth_token');
+}
+
+// ---------------------------------------------------------------------------
+// Core fetch wrapper
+// ---------------------------------------------------------------------------
+
 async function apiFetch(path, options = {}) {
   const url = `${API_BASE}${path}`;
-  const defaults = {
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-  };
+
+  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+  if (_authToken) headers['Authorization'] = `Bearer ${_authToken}`;
 
   let response;
   try {
-    response = await fetch(url, { ...defaults, ...options, headers: { ...defaults.headers, ...(options.headers || {}) } });
+    response = await fetch(url, {
+      credentials: 'include',
+      ...options,
+      headers,
+    });
   } catch (err) {
-    // Network failure (offline, DNS failure, CORS preflight failure, AbortError)
     if (err.name === 'AbortError') throw err;
     const networkErr = new Error('Cannot reach server. Check your connection.');
     networkErr.code = 'NETWORK_ERROR';
@@ -45,12 +61,6 @@ async function apiFetch(path, options = {}) {
 // Analysis
 // ---------------------------------------------------------------------------
 
-/**
- * Send email text for phishing analysis.
- * @param {string} emailText
- * @param {AbortSignal} [signal]
- * @returns {Promise<Object>} analysis result
- */
 export async function analyzeEmail(emailText, signal) {
   return apiFetch('/analyze', {
     method: 'POST',
@@ -63,10 +73,6 @@ export async function analyzeEmail(emailText, signal) {
 // Auth
 // ---------------------------------------------------------------------------
 
-/**
- * Register a new user account.
- * @param {{ username: string, email: string, password: string }} fields
- */
 export async function register({ username, email, password }) {
   return apiFetch('/auth/register', {
     method: 'POST',
@@ -74,27 +80,20 @@ export async function register({ username, email, password }) {
   });
 }
 
-/**
- * Log in and receive a session cookie.
- * @param {{ email: string, password: string }} fields
- * @returns {Promise<{ user: Object }>}
- */
 export async function login({ email, password }) {
-  return apiFetch('/auth/login', {
+  const data = await apiFetch('/auth/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
+  if (data.token) setAuthToken(data.token);
+  return data;
 }
 
-/** Log out and clear the session cookie. */
 export async function logout() {
+  setAuthToken(null);
   return apiFetch('/auth/logout', { method: 'POST' });
 }
 
-/**
- * Fetch the currently authenticated user (used on mount).
- * Returns null instead of throwing on 401.
- */
 export async function getMe() {
   try {
     return await apiFetch('/auth/me');
@@ -108,7 +107,6 @@ export async function getMe() {
 // History
 // ---------------------------------------------------------------------------
 
-/** Fetch the authenticated user's scan history. */
 export async function getHistory() {
   return apiFetch('/history');
 }
