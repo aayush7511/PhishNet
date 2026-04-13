@@ -5,6 +5,7 @@ import StatRow from '../input/StatRow.jsx';
 import ScanButton from '../input/ScanButton.jsx';
 import ExtractButton from '../input/ExtractButton.jsx';
 import Toast from '../input/Toast.jsx';
+import ProfileButton from '../profile/ProfileButton.jsx';
 import { timeAgo } from '../../utils/timeAgo.js';
 
 /**
@@ -15,6 +16,8 @@ export default function InputScreen({
   setEmailText,
   onScan,
   isLoggedIn,
+  user,
+  onOpenProfile,
   setShowAuthModal,
   lastScan,
   scanCountToday,
@@ -62,10 +65,16 @@ export default function InputScreen({
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--text-muted)' }} />
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          </svg>
+          {isLoggedIn && user ? (
+            <ProfileButton username={user.username} onClick={onOpenProfile} />
+          ) : (
+            <>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--text-muted)' }} />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </>
+          )}
         </div>
       </div>
 

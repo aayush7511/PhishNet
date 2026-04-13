@@ -8,7 +8,7 @@ import GuestUpsell from '../results/GuestUpsell.jsx';
  * ResultsScreen — displays analysis result for all three risk levels.
  * One component; risk_level prop drives appearance.
  */
-export default function ResultsScreen({ result, isLoggedIn, onNewScan, setShowAuthModal }) {
+export default function ResultsScreen({ result, isLoggedIn, user, onOpenProfile, onNewScan, setShowAuthModal }) {
   const { score, risk_level, risk_label, findings, ai_reasoning } = result;
 
   function handleSignIn() {
@@ -17,7 +17,7 @@ export default function ResultsScreen({ result, isLoggedIn, onNewScan, setShowAu
 
   return (
     <div style={{ padding: '20px' }}>
-      <ResultsHeader riskLevel={risk_level} />
+      <ResultsHeader riskLevel={risk_level} isLoggedIn={isLoggedIn} user={user} onOpenProfile={onOpenProfile} />
       <ScoreDisplay score={score} riskLevel={risk_level} riskLabel={risk_label} />
       <FindingsList findings={findings} aiReasoning={ai_reasoning} />
       <ActionButtons riskLevel={risk_level} onNewScan={onNewScan} />

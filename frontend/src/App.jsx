@@ -4,6 +4,7 @@ import InputScreen from './components/screens/InputScreen.jsx';
 import ScanningScreen from './components/screens/ScanningScreen.jsx';
 import ResultsScreen from './components/screens/ResultsScreen.jsx';
 import AuthModal from './components/auth/AuthModal.jsx';
+import ProfilePanel from './components/profile/ProfilePanel.jsx';
 import { analyzeEmail, getMe, logout } from './api/client.js';
 import { useScanStats } from './hooks/useScanStats.js';
 
@@ -21,6 +22,7 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalTab, setAuthModalTab] = useState('login');
+  const [showProfilePanel, setShowProfilePanel] = useState(false);
 
   // AbortController ref for cancellable fetch
   const abortRef = useRef(null);
@@ -101,6 +103,7 @@ export default function App() {
     try { await logout(); } catch { /* ignore */ }
     setIsLoggedIn(false);
     setUser(null);
+    setShowProfilePanel(false);
   }
 
   function openAuthModal(tab = 'login') {
@@ -113,32 +116,46 @@ export default function App() {
   // -------------------------------------------------------------------------
   return (
     <AppShell>
-      {screen === 'input' && (
-        <InputScreen
-          emailText={emailText}
-          setEmailText={setEmailText}
-          onScan={handleScan}
-          isLoggedIn={isLoggedIn}
-          setShowAuthModal={() => openAuthModal('login')}
-          lastScan={lastScan}
-          scanCountToday={scanCountToday}
+      {showProfilePanel ? (
+        <ProfilePanel
+          user={user}
+          onClose={() => setShowProfilePanel(false)}
+          onLogout={handleLogout}
         />
-      )}
+      ) : (
+        <>
+          {screen === 'input' && (
+            <InputScreen
+              emailText={emailText}
+              setEmailText={setEmailText}
+              onScan={handleScan}
+              isLoggedIn={isLoggedIn}
+              user={user}
+              onOpenProfile={() => setShowProfilePanel(true)}
+              setShowAuthModal={() => openAuthModal('login')}
+              lastScan={lastScan}
+              scanCountToday={scanCountToday}
+            />
+          )}
 
-      {screen === 'scanning' && (
-        <ScanningScreen
-          onCancel={handleCancel}
-          fetchResolved={fetchResolved}
-        />
-      )}
+          {screen === 'scanning' && (
+            <ScanningScreen
+              onCancel={handleCancel}
+              fetchResolved={fetchResolved}
+            />
+          )}
 
-      {screen === 'results' && scanResult && (
-        <ResultsScreen
-          result={scanResult}
-          isLoggedIn={isLoggedIn}
-          onNewScan={handleNewScan}
-          setShowAuthModal={() => openAuthModal('register')}
-        />
+          {screen === 'results' && scanResult && (
+            <ResultsScreen
+              result={scanResult}
+              isLoggedIn={isLoggedIn}
+              user={user}
+              onOpenProfile={() => setShowProfilePanel(true)}
+              onNewScan={handleNewScan}
+              setShowAuthModal={() => openAuthModal('register')}
+            />
+          )}
+        </>
       )}
 
       {showAuthModal && (

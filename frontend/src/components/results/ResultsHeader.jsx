@@ -1,7 +1,9 @@
+import ProfileButton from '../profile/ProfileButton.jsx';
+
 /**
  * ResultsHeader — varies by risk_level (low / medium / high).
  */
-export default function ResultsHeader({ riskLevel }) {
+export default function ResultsHeader({ riskLevel, isLoggedIn, user, onOpenProfile }) {
   const isHigh = riskLevel === 'high';
   const isMedium = riskLevel === 'medium';
 
@@ -33,20 +35,24 @@ export default function ResultsHeader({ riskLevel }) {
         </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-        {isMedium && (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {isMedium && !isLoggedIn && (
           <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)' }}>
             SCAN COMPLETE
           </span>
         )}
-        {isHigh && (
+        {isHigh && !isLoggedIn && (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" strokeWidth="2">
             <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
             <line x1="12" y1="9" x2="12" y2="13"/>
             <line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
         )}
-        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: dotColor }} />
+        {isLoggedIn && user ? (
+          <ProfileButton username={user.username} onClick={onOpenProfile} />
+        ) : (
+          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: dotColor }} />
+        )}
       </div>
     </div>
   );

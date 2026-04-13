@@ -59,6 +59,10 @@ def create_app(config_class=Config):
     # -----------------------------------------------------------------------
     # Global error handlers
     # -----------------------------------------------------------------------
+    @app.route("/health")
+    def health():
+        return jsonify({"status": "ok"}), 200
+
     @app.errorhandler(404)
     def not_found(e):
         return jsonify({"error": True, "code": "NOT_FOUND", "message": "Endpoint not found"}), 404
