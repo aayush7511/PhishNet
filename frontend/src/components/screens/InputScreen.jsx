@@ -68,12 +68,30 @@ export default function InputScreen({
           {isLoggedIn && user ? (
             <ProfileButton username={user.username} onClick={onOpenProfile} />
           ) : (
-            <>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--text-muted)' }} />
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              </svg>
-            </>
+            <button
+              onClick={setShowAuthModal}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '8px',
+                border: '1px solid var(--border)',
+                background: 'transparent',
+                color: 'var(--blue)',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'background 0.15s, border-color 0.15s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = 'var(--bg-row)';
+                e.currentTarget.style.borderColor = 'var(--blue)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.borderColor = 'var(--border)';
+              }}
+            >
+              Sign in
+            </button>
           )}
         </div>
       </div>
