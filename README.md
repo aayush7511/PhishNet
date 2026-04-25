@@ -11,7 +11,7 @@ An AI-powered phishing email scanner. Paste a suspicious email, get a risk score
 - Paste any email content into the scanner
 - Receive a 0–100 risk score with a LOW / MEDIUM / HIGH label
 - See up to 6 expandable findings explaining what triggered the score
-- Sign in to save your scan history (last 50 scans)
+- Sign in to save your scan history(last 50 scans)
 - Works as a guest — no account required to scan
 
 ---
